@@ -9,10 +9,10 @@ import {firebaseConfig} from './config';
 
 Vue.use(VueFire)
 
-const firebaseApp = firebase.initializeApp(firebaseConfig);
-export const auth = firebaseApp.auth();
-export const db = firebaseApp.firestore();
-export const storage = firebaseApp.storage();
-export const functions = firebaseApp.functions();
+firebase.initializeApp(firebaseConfig);
+export const auth = firebase.auth();
+export const db = firebase.firestore();
+export const storage = firebase.storage();
+export const functions = firebase.functions();
 export const FirebaseTimestamp = firebase.firestore.Timestamp;
 export const fv = firebase.firestore.FieldValue;
