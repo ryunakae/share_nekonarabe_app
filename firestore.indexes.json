@@ -1,0 +1,87 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "cards",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "belong_to",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "position_y",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "position_x",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "cards",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "belong_to",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "position_y",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "random",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "cards",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "belong_to",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "random",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "cards",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "belong_to",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "random",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "cards",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "card_type",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "front",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "random",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
