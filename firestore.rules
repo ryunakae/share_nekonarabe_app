@@ -2,8 +2,31 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /{document=**} {
-      allow read, write: if
-          request.time < timestamp.date(2021, 2, 16);
+      allow read, write: if false
+    }
+
+    function isCardInTheEnumPoints() {
+      return request.resource.data.points in [0,1,2];
+    }
+    function isCardInTheEnumFront() {
+      return request.resource.data.front in ["head","pink","water","almighty"];
+    }
+    function isCardInTheEnumBack() {
+      return request.resource.data.back in ["tail","pink","water","almighty","head"];
+    }
+    function isCardInTheEnumCardType() {
+      return request.resource.data.cardType in ["ribbon","buchi","shima","fish","dokan"];
+    }
+    function hasInitiality() {
+      return request.resource.data.initiality || !request.resource.data.initiality
+    }
+    function isSuccessfulCard() {
+      return isCardInTheEnumPoints() && isCardInTheEnumFront() && isCardInTheEnumBack() && isCardInTheEnumCardType() && hasInitiality()
+    }
+
+    match /cards/{docId} {
+      allow read: if true
+      allow write: if isSuccessfulCard()
     }
   }
 }

@@ -27,7 +27,7 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 ```
 cards:
   docID: string = //initial character of each params eg. 1pprn
-  points: enum = [1,2,3]
+  points: enum = [0,1,2]
   front: enum = ["head","pink","water","almighty"]
   back: enum = ["tail","pink","water","almighty","head"]
   cardType: enum = ["ribbon","buchi","shima","fish","dokan"]
