@@ -24,6 +24,7 @@ yarn lint
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ### schema
+```
 cards:
   docID: string = //initial character of each params eg. 1pprn
   points: enum = [1,2,3]
@@ -42,4 +43,4 @@ table:
     playerID: string = uuid
     name: string = //username or choose before game
     hand: number = //# of cards in his/her hand
-    
+```
