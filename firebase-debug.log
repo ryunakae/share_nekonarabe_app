@@ -1,0 +1,60 @@
+[debug] [2021-02-20T23:51:09.038Z] ----------------------------------------------------------------------
+[debug] [2021-02-20T23:51:09.040Z] Command:       /usr/local/bin/node /usr/local/bin/firebase emulators:start
+[debug] [2021-02-20T23:51:09.040Z] CLI Version:   9.4.0
+[debug] [2021-02-20T23:51:09.040Z] Platform:      darwin
+[debug] [2021-02-20T23:51:09.040Z] Node Version:  v14.15.1
+[debug] [2021-02-20T23:51:09.042Z] Time:          Sun Feb 21 2021 08:51:09 GMT+0900 (日本標準時)
+[debug] [2021-02-20T23:51:09.042Z] ----------------------------------------------------------------------
+[debug] [2021-02-20T23:51:09.042Z] 
+[debug] [2021-02-20T23:51:09.049Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2021-02-20T23:51:09.050Z] > authorizing via signed-in user
+[info] i  emulators: Starting emulators: auth, firestore, hosting {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: auth, firestore, hosting"}}
+[debug] [2021-02-20T23:51:09.068Z] [hub] writing locator at /var/folders/nt/q7l7c29n5bqg5lz0kv1lyy5h0000gn/T/hub-nekonarabe-app.json
+[debug] [2021-02-20T23:51:09.095Z] Ignoring unsupported arg: projectId {"metadata":{"emulator":{"name":"firestore"},"message":"Ignoring unsupported arg: projectId"}}
+[debug] [2021-02-20T23:51:09.095Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"firestore"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2021-02-20T23:51:09.096Z] Starting Firestore Emulator with command {"binary":"java","args":["-Dgoogle.cloud_firestore.debug_log_level=FINE","-Duser.language=en","-jar","/Users/ryunakae/.cache/firebase/emulators/cloud-firestore-emulator-v1.11.12.jar","--host","localhost","--port",8080,"--rules","/Users/ryunakae/Documents/work/official_nekonarabe-app/firestore.rules"],"optionalArgs":["port","webchannel_port","host","rules","functions_emulator","seed_from_export"],"joinArgs":false} {"metadata":{"emulator":{"name":"firestore"},"message":"Starting Firestore Emulator with command {\"binary\":\"java\",\"args\":[\"-Dgoogle.cloud_firestore.debug_log_level=FINE\",\"-Duser.language=en\",\"-jar\",\"/Users/ryunakae/.cache/firebase/emulators/cloud-firestore-emulator-v1.11.12.jar\",\"--host\",\"localhost\",\"--port\",8080,\"--rules\",\"/Users/ryunakae/Documents/work/official_nekonarabe-app/firestore.rules\"],\"optionalArgs\":[\"port\",\"webchannel_port\",\"host\",\"rules\",\"functions_emulator\",\"seed_from_export\"],\"joinArgs\":false}"}}
+[info] i  firestore: Firestore Emulator logging to firestore-debug.log {"metadata":{"emulator":{"name":"firestore"},"message":"Firestore Emulator logging to \u001b[1mfirestore-debug.log\u001b[22m"}}
+[debug] [2021-02-20T23:51:10.807Z] API endpoint: http://localhost {"metadata":{"emulator":{"name":"firestore"},"message":"API endpoint: http://localhost"}}
+[debug] [2021-02-20T23:51:10.807Z] :8080
+If you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:
+
+   export FIRESTORE_EMULATOR_HOST=localhost:8080
+
+Dev App Server is now running.
+
+ {"metadata":{"emulator":{"name":"firestore"},"message":":8080\nIf you are using a library that supports the FIRESTORE_EMULATOR_HOST environment variable, run:\n\n   export FIRESTORE_EMULATOR_HOST=localhost:8080\n\nDev App Server is now running.\n\n"}}
+[debug] [2021-02-20T23:51:12.817Z] > refreshing access token with scopes: []
+[debug] [2021-02-20T23:51:12.817Z] >>> HTTP REQUEST POST https://www.googleapis.com/oauth2/v3/token  
+ <request body omitted>
+[debug] [2021-02-20T23:51:13.013Z] <<< HTTP RESPONSE 200 {"cache-control":"no-cache, no-store, max-age=0, must-revalidate","expires":"Mon, 01 Jan 1990 00:00:00 GMT","pragma":"no-cache","date":"Sat, 20 Feb 2021 23:51:13 GMT","content-type":"application/json; charset=utf-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","server":"scaffolding on HTTPServer2","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"h3-29=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-Q050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"","accept-ranges":"none","transfer-encoding":"chunked"}
+[debug] [2021-02-20T23:51:13.036Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/nekonarabe-app/webApps/-/config [none]
+[debug] [2021-02-20T23:51:14.411Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/nekonarabe-app/webApps/-/config 200
+[debug] [2021-02-20T23:51:14.411Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/nekonarabe-app/webApps/-/config {"projectId":"nekonarabe-app","appId":"1:895709569330:web:133dae20325d99ce2e372b","storageBucket":"nekonarabe-app.appspot.com","locationId":"asia-northeast1","apiKey":"AIzaSyA9dcIlI2Fvh-yh84iVOzE3QzPRHxv3-F8","authDomain":"nekonarabe-app.firebaseapp.com","messagingSenderId":"895709569330","measurementId":"G-62YLEDPNLP"}
+[info] i  hosting: Serving hosting files from: dist {"metadata":{"emulator":{"name":"hosting"},"message":"Serving hosting files from: \u001b[1mdist\u001b[22m"}}
+[info] ✔  hosting: Local server: http://localhost:5000 {"metadata":{"emulator":{"name":"hosting"},"message":"Local server: \u001b[4m\u001b[1mhttp://localhost:5000\u001b[22m\u001b[24m"}}
+[debug] [2021-02-20T23:51:14.695Z] Ignoring unsupported arg: auto_download {"metadata":{"emulator":{"name":"ui"},"message":"Ignoring unsupported arg: auto_download"}}
+[debug] [2021-02-20T23:51:14.695Z] Ignoring unsupported arg: port {"metadata":{"emulator":{"name":"ui"},"message":"Ignoring unsupported arg: port"}}
+[debug] [2021-02-20T23:51:14.696Z] Starting Emulator UI with command {"binary":"node","args":["/Users/ryunakae/.cache/firebase/emulators/ui-v1.4.1/server.bundle.js"],"optionalArgs":[],"joinArgs":false} {"metadata":{"emulator":{"name":"ui"},"message":"Starting Emulator UI with command {\"binary\":\"node\",\"args\":[\"/Users/ryunakae/.cache/firebase/emulators/ui-v1.4.1/server.bundle.js\"],\"optionalArgs\":[],\"joinArgs\":false}"}}
+[info] i  ui: Emulator UI logging to ui-debug.log {"metadata":{"emulator":{"name":"ui"},"message":"Emulator UI logging to \u001b[1mui-debug.log\u001b[22m"}}
+[debug] [2021-02-20T23:51:14.796Z] Web / API server started at http://localhost:4000
+ {"metadata":{"emulator":{"name":"ui"},"message":"Web / API server started at http://localhost:4000\n"}}
+[info] 
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+│ i  View Emulator UI at http://localhost:4000                │
+└─────────────────────────────────────────────────────────────┘
+
+┌────────────────┬────────────────┬─────────────────────────────────┐
+│ Emulator       │ Host:Port      │ View in Emulator UI             │
+├────────────────┼────────────────┼─────────────────────────────────┤
+│ Authentication │ localhost:9099 │ http://localhost:4000/auth      │
+├────────────────┼────────────────┼─────────────────────────────────┤
+│ Firestore      │ localhost:8080 │ http://localhost:4000/firestore │
+├────────────────┼────────────────┼─────────────────────────────────┤
+│ Hosting        │ localhost:5000 │ n/a                             │
+└────────────────┴────────────────┴─────────────────────────────────┘
+  Emulator Hub running at localhost:4400
+  Other reserved ports: 4500
+
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 

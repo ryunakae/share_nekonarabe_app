@@ -8,4 +8,7 @@ describe("nekonarabe app", () => {
   it("first test", () => {
     assert.equal(2+2, 4);
   });
+
+  it("", async() => {
+  });
 })
