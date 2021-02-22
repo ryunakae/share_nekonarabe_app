@@ -17,14 +17,14 @@ describe("nekonarabe app", () => {
     const db = firebase.initializeTestApp({projectId: MY_PROJECT_ID}).firestore();
     const successfulCard = {
       points: 1,
-      front: "pink",
-      back: "pink",
-      cardType: "ribbon",
+      front: "p_ink",
+      back: "p_ink",
+      cardType: "r_ibbon",
       initiality: false
     }
 
     it("Can create successfull card", async() => {
-      await firebase.assertSucceeds(db.collection("cards").doc('1pprn').set(successfulCard))
+      await firebase.assertSucceeds(db.collection("cards").doc('1_p_p_r_n').set(successfulCard))
     });
 
     describe("unsuccessfull card", () => {
@@ -33,38 +33,58 @@ describe("nekonarabe app", () => {
 
       it("Can't create too big point card", async() => {
         unsuccessfullCard.points = 3;
-        await firebase.assertFails(cards.doc('1pprn').set(unsuccessfullCard));
+        await firebase.assertFails(cards.doc('3_p_p_r_n').set(unsuccessfullCard));
         unsuccessfullCard.points = 1;
       });
 
       it("Can't create too small point card", async() => {
         unsuccessfullCard.points = -1;
-        await firebase.assertFails(cards.doc('1pprn').set(unsuccessfullCard));
+        await firebase.assertFails(cards.doc('-1_p_p_r_n').set(unsuccessfullCard));
         unsuccessfullCard.points = 1;
       });
 
       it("Can't create card with wrong frot", async() => {
-        unsuccessfullCard.front = "tail"
-        await firebase.assertFails(cards.doc('1pprn').set(unsuccessfullCard))
-        unsuccessfullCard.front = "pink"
+        unsuccessfullCard.front = "t_ail"
+        await firebase.assertFails(cards.doc('1_t_p_r_n').set(unsuccessfullCard))
+        unsuccessfullCard.front = "p_ink"
       });
 
       it("Can't create card with wrong back", async() => {
-        unsuccessfullCard.back = "xxx"
-        await firebase.assertFails(cards.doc('1pprn').set(unsuccessfullCard))
-        unsuccessfullCard.back = "pink"
+        unsuccessfullCard.back = "x_xx"
+        await firebase.assertFails(cards.doc('1_p_x_r_n').set(unsuccessfullCard))
+        unsuccessfullCard.back = "p_ink"
       });
 
       it("Can't create card with wrong cardType", async() => {
-        unsuccessfullCard.cardType = "xxx"
-        await firebase.assertFails(cards.doc('1pprn').set(unsuccessfullCard))
-        unsuccessfullCard.cardType = "ribbon"
+        unsuccessfullCard.cardType = "x_xx"
+        await firebase.assertFails(cards.doc('1_p_p_x_n').set(unsuccessfullCard))
+        unsuccessfullCard.cardType = "r_ibbon"
       });
 
       it("Can't create card without initiality", async() => {
         unsuccessfullCard.initiality = null
-        await firebase.assertFails(cards.doc('1pprn').set(unsuccessfullCard))
+        await firebase.assertFails(cards.doc('1_p_p_r_n').set(unsuccessfullCard))
         unsuccessfullCard.initiality = false
+      });
+
+      it("Can't create card with wrong points", async() => {
+        await firebase.assertFails(cards.doc('2_p_p_r_n').set(unsuccessfullCard));
+      });
+
+      it("Can't create card with wrong front", async() => {
+        await firebase.assertFails(cards.doc('1_h_p_r_n').set(unsuccessfullCard));
+      });
+
+      it("Can't create card with wrong back", async() => {
+        await firebase.assertFails(cards.doc('1_p_t_r_n').set(unsuccessfullCard));
+      });
+
+      it("Can't create card with wrong cardType", async() => {
+        await firebase.assertFails(cards.doc('1_p_p_b_n').set(unsuccessfullCard));
+      });
+
+      it("Can't create card with wrong initiality", async() => {
+        await firebase.assertFails(cards.doc('1_p_p_r_i').set(unsuccessfullCard));
       });
     });
     
