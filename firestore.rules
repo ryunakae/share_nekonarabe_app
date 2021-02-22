@@ -62,19 +62,11 @@ service cloud.firestore {
       allow create: if isSuccessfulCard()
     }
 
-    function isSuccessfulTable() {
-      return true
-    }
-
-    function isAllowedChangeForTable() {
-      return true
-    }
-
     match /tables/{tableId} {
+    
       function isSuccessfulTable() {
       return true
       }
-
       function isAllowedChangeForTable() {
         return true
       }
@@ -84,9 +76,6 @@ service cloud.firestore {
       allow update: if isSuccessfulTable() && isAllowedChangeForTable()
       
       match /deck/{deckCardId} {
-        function isSuccessfulDeckCard() {
-          return true
-        }
         function isSuccessfulDeckCard() {
           return true
         }
