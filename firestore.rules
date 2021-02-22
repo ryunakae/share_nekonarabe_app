@@ -5,70 +5,95 @@ service cloud.firestore {
       allow read, write: if false
     }
 
-    function pointsNumber() {
-      return request.resource.data.points
-    }
-    function isCardInTheEnumPoints() {
-      return request.resource.data.points in [0,1,2];
-    }
-    function isCardInTheEnumFront() {
-      return request.resource.data.front in ["h_ead","p_ink","w_ater","a_lmighty"];
-    }
-    function isCardInTheEnumBack() {
-      return request.resource.data.back in ["t_ail","p_ink","w_ater","a_lmighty","h_ead"];
-    }
-    function isCardInTheEnumCardType() {
-      return request.resource.data.cardType in ["r_ibbon","b_uchi","s_hima","f_ish","d_okan"];
-    }
-    function hasInitiality() {
-      return request.resource.data.initiality || !request.resource.data.initiality
-    }
-    function isEqualIDZero() {
-      return request.resource.id.split('_')[0] == "0"
-    }
-    function isEqualPointsZero() {
-      return request.resource.data.points == 0
-    }
-    function isEqualIDOne() {
-      return request.resource.id.split('_')[0] == "1"
-    }
-    function isEqualPointsOne() {
-      return request.resource.data.points == 1
-    }
-    function isEqualIDTwo() {
-      return request.resource.id.split('_')[0] == "2"
-    }
-    function isEqualPointsTwo() {
-      return request.resource.data.points == 2
-    }
-    function isEqualPointsAndID() {
-      return (isEqualIDZero() && isEqualPointsZero()) || (isEqualIDOne() && isEqualPointsOne()) || (isEqualIDTwo() && isEqualPointsTwo())
-    }
-    function isEqualFrontAndID() {
-      return request.resource.id.split('_')[1] == request.resource.data.front.split('_')[0]
-    }
-    function isEqualBackAndID() {
-      return request.resource.id.split('_')[2] == request.resource.data.back.split('_')[0]
-    }
-    function isEqualCardTypeAndID() {
-      return request.resource.id.split('_')[3] == request.resource.data.cardType.split('_')[0]
-    }
-    function isTrueInitiality() {
-      return request.resource.data.initiality == true
-    }
-    function isFalseInitiality() {
-      return request.resource.data.initiality == false
-    }
-    function hasCorrectInitiality() {
-      return (isTrueInitiality() && request.resource.id.split('_')[4] == "i") || (isFalseInitiality() && request.resource.id.split('_')[4] == "n")
-    }
-    function isSuccessfulCard() {
-      return isCardInTheEnumPoints() && isCardInTheEnumFront() && isCardInTheEnumBack() && isCardInTheEnumCardType() && hasInitiality() && isEqualPointsAndID() && isEqualFrontAndID() && isEqualBackAndID() && isEqualCardTypeAndID() && hasCorrectInitiality()
-    }
+    match /cards/{cardId} {
+      function isCardInTheEnumFront() {
+        return request.resource.data.front in ["h_ead","p_ink","w_ater","a_lmighty"];
+      }
+      function isCardInTheEnumBack() {
+        return request.resource.data.back in ["t_ail","p_ink","w_ater","a_lmighty","h_ead"];
+      }
+      function isCardInTheEnumCardType() {
+        return request.resource.data.cardType in ["r_ibbon","b_uchi","s_hima","f_ish","d_okan"];
+      }
+      function isEqualIDZero() {
+        return request.resource.id.split('_')[0] == "0"
+      }
+      function isEqualPointsZero() {
+        return request.resource.data.points == 0
+      }
+      function isEqualIDOne() {
+        return request.resource.id.split('_')[0] == "1"
+      }
+      function isEqualPointsOne() {
+        return request.resource.data.points == 1
+      }
+      function isEqualIDTwo() {
+        return request.resource.id.split('_')[0] == "2"
+      }
+      function isEqualPointsTwo() {
+        return request.resource.data.points == 2
+      }
+      function isEqualPointsAndID() {
+        return (isEqualIDZero() && isEqualPointsZero()) || (isEqualIDOne() && isEqualPointsOne()) || (isEqualIDTwo() && isEqualPointsTwo())
+      }
+      function isEqualFrontAndID() {
+        return request.resource.id.split('_')[1] == request.resource.data.front.split('_')[0]
+      }
+      function isEqualBackAndID() {
+        return request.resource.id.split('_')[2] == request.resource.data.back.split('_')[0]
+      }
+      function isEqualCardTypeAndID() {
+        return request.resource.id.split('_')[3] == request.resource.data.cardType.split('_')[0]
+      }
+      function isTrueInitiality() {
+        return request.resource.data.initiality == true
+      }
+      function isFalseInitiality() {
+        return request.resource.data.initiality == false
+      }
+      function hasCorrectInitiality() {
+        return (isTrueInitiality() && request.resource.id.split('_')[4] == "i") || (isFalseInitiality() && request.resource.id.split('_')[4] == "n")
+      }
+      function isSuccessfulCard() {
+        return isCardInTheEnumFront() && isCardInTheEnumBack() && isCardInTheEnumCardType() && isEqualPointsAndID() && isEqualFrontAndID() && isEqualBackAndID() && isEqualCardTypeAndID() && hasCorrectInitiality()
+      }
 
-    match /cards/{docId} {
       allow read: if true
       allow create: if isSuccessfulCard()
+    }
+
+    function isSuccessfulTable() {
+      return true
+    }
+
+    function isAllowedChangeForTable() {
+      return true
+    }
+
+    match /tables/{tableId} {
+      function isSuccessfulTable() {
+      return true
+      }
+
+      function isAllowedChangeForTable() {
+        return true
+      }
+
+      allow read: if true
+      allow create: if isSuccessfulTable()
+      allow update: if isSuccessfulTable() && isAllowedChangeForTable()
+      
+      match /deck/{deckCardId} {
+        function isSuccessfulDeckCard() {
+          return true
+        }
+        function isSuccessfulDeckCard() {
+          return true
+        }
+
+        allow read: if true
+        allow create: if isSuccessfulDeckCard()
+      }
     }
   }
 }
