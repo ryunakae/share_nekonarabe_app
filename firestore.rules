@@ -75,14 +75,14 @@ service cloud.firestore {
       allow create: if isSuccessfulTable()
       allow update: if isSuccessfulTable() && isAllowedChangeForTable()
       
-      match /deck/{deckCardId} {
-        function isSuccessfulDeckCard() {
-          return true
-        }
+      // match /deck/{deckCardId} {
+      //   function isSuccessfulDeckCard() {
+      //     return true
+      //   }
 
-        allow read: if true
-        allow create: if isSuccessfulDeckCard()
-      }
+      //   allow read: if true
+      //   allow create: if isSuccessfulDeckCard()
+      // }
 
       match /players/{prayerId} {
         function isSuccessfulPlayer() {
@@ -90,7 +90,7 @@ service cloud.firestore {
         }
 
         allow read: if true
-        allow create: if isSuccessfulPlayer()
+        allow write: if isSuccessfulPlayer()
       }
     }
   }

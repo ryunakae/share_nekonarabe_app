@@ -3,12 +3,13 @@ const firebase = require('@firebase/testing');
 
 const MY_PROJECT_ID = "nekonarabe-app";
 
-beforeEach(async() => {
-  await firebase.clearFirestoreData({projectId: MY_PROJECT_ID});
-})
+// beforeEach(async() => {
+//   await firebase.clearFirestoreData({projectId: MY_PROJECT_ID});
+// })
 
 describe("nekonarabe app", () => {
   const db = firebase.initializeTestApp({projectId: MY_PROJECT_ID}).firestore();
+  const fv = firebase.firestore.FieldValue
   
   describe("cards", () => {
     const cards = db.collection("cards");
@@ -25,7 +26,10 @@ describe("nekonarabe app", () => {
     });
 
     describe("unsuccessful card", () => {
-      const unsuccessfulCard = successfulCard
+      const unsuccessfulCard = successfulCard;
+      beforeEach(async() => {
+        await firebase.clearFirestoreData({projectId: MY_PROJECT_ID});
+      })
 
       it("Can't create too big point card", async() => {
         unsuccessfulCard.points = 3;
@@ -85,22 +89,94 @@ describe("nekonarabe app", () => {
     });
   });
 
-  describe("tables", () => {
-    describe("deck", () => {
-      const successfulDeckCard = {}
-      it("Can have successful cards", async() => {
-        await firebase.assertSucceeds(db.collection("tables").doc('uid').set(successfulDeckCard))
-      });
-    });
-    const successfulTable = {
+  describe("game flow", () => {
+    const tableRef = db.collection("tables").doc()
 
-    }
-    it("Can create successful table", async() => {
-      await firebase.assertSucceeds(db.collection("tables").doc('uid').set(successfulTable))
-    });
+    it("Create table", async() => {
+      const batch = db.batch();
+      const dealer = tableRef.collection("players").doc("dealer");
+      batch.set(dealer, {name: 'dealer'});
+      const player1 = tableRef.collection("players").doc();
+      batch.set(player1, {name: 'Ryu'});
+      await firebase.assertSucceeds(batch.commit())
+    })
+
+    const initialCards = [
+      '0_h_a_r_i', '0_h_a_r_i', '0_h_a_b_i', '0_h_a_b_i', '0_h_a_s_i', '0_h_a_s_i',
+      '0_a_t_r_i', '0_a_t_r_i', '0_a_t_b_i', '0_a_t_b_i', '0_a_t_s_i', '0_a_t_s_i',
+    ]
+    const sampleDeck = [
+      '0_h_p_r_n', '0_h_p_r_n', '0_h_p_b_n', '0_h_p_b_n', '0_h_p_s_n', '0_h_p_s_n',
+      '0_h_w_r_n', '0_h_w_r_n', '0_h_w_b_n', '0_h_w_b_n', '0_h_w_s_n', '0_h_w_s_n',
+      '0_a_a_d_n', '0_a_a_d_n', '1_a_a_d_n', '1_a_a_d_n', '1_a_a_d_n',
+      '1_p_p_r_n', '1_p_p_b_n', '1_p_p_s_n', '1_w_w_r_n', '1_w_w_b_n', '1_w_w_s_n',
+      '1_p_w_r_n', '1_p_w_r_n', '1_p_w_b_n', '1_p_w_b_n', '1_p_w_s_n', '1_p_w_s_n',
+      '1_w_p_r_n', '1_w_p_r_n', '1_w_p_b_n', '1_w_p_b_n', '1_w_p_s_n', '1_w_p_s_n',
+      '2_p_p_r_n', '2_p_p_b_n', '2_p_p_s_n', '2_w_w_r_n', '2_w_w_b_n', '2_w_w_s_n',
+      '2_p_w_r_n', '2_p_w_b_n', '2_p_w_s_n', '2_w_p_r_n', '2_w_p_b_n', '2_w_p_s_n',
+      '0_p_t_r_n', '0_p_t_b_n', '0_p_t_s_n', '0_w_t_r_n', '0_w_t_b_n', '0_w_t_s_n',
+      '0_a_t_r_n', '0_a_t_b_n', '0_a_t_s_n', '1_h_h_f_n', '1_h_h_f_n'
+    ]
+
   });
+
+  // describe("tables", () => {
+  //   const table = db.collection("tables").doc("sampleTable")
+  //   describe("deck", () => {
+  //     const initialCards = [
+  //       '0_h_a_r_i', '0_h_a_r_i', '0_h_a_b_i', '0_h_a_b_i', '0_h_a_s_i', '0_h_a_s_i',
+  //       '0_a_t_r_i', '0_a_t_r_i', '0_a_t_b_i', '0_a_t_b_i', '0_a_t_s_i', '0_a_t_s_i',
+  //     ]
+  //     const sampleDeck = [
+  //       '0_h_p_r_n', '0_h_p_r_n', '0_h_p_b_n', '0_h_p_b_n', '0_h_p_s_n', '0_h_p_s_n',
+  //       '0_h_w_r_n', '0_h_w_r_n', '0_h_w_b_n', '0_h_w_b_n', '0_h_w_s_n', '0_h_w_s_n',
+  //       '0_a_a_d_n', '0_a_a_d_n', '1_a_a_d_n', '1_a_a_d_n', '1_a_a_d_n',
+  //       '1_p_p_r_n', '1_p_p_b_n', '1_p_p_s_n', '1_w_w_r_n', '1_w_w_b_n', '1_w_w_s_n',
+  //       '1_p_w_r_n', '1_p_w_r_n', '1_p_w_b_n', '1_p_w_b_n', '1_p_w_s_n', '1_p_w_s_n',
+  //       '1_w_p_r_n', '1_w_p_r_n', '1_w_p_b_n', '1_w_p_b_n', '1_w_p_s_n', '1_w_p_s_n',
+  //       '2_p_p_r_n', '2_p_p_b_n', '2_p_p_s_n', '2_w_w_r_n', '2_w_w_b_n', '2_w_w_s_n',
+  //       '2_p_w_r_n', '2_p_w_b_n', '2_p_w_s_n', '2_w_p_r_n', '2_w_p_b_n', '2_w_p_s_n',
+  //       '0_p_t_r_n', '0_p_t_b_n', '0_p_t_s_n', '0_w_t_r_n', '0_w_t_b_n', '0_w_t_s_n',
+  //       '0_a_t_r_n', '0_a_t_b_n', '0_a_t_s_n', '1_h_h_f_n', '1_h_h_f_n'
+  //     ]
+  //   });
+
+  //   describe("players", () => {
+  //     const successfullyCreatedPlayer = {
+  //       name: "Ryu"
+  //     }
+  //     it("Can create successful player", async() => {
+  //       await firebase.assertSucceeds(table.collection("players").doc('player1').set(successfullyCreatedPlayer))
+  //     });
+
+  //     it("Player can draw initial cards", async() => {
+  //       await firebase.assertSucceeds(table.collection("players").doc('player1').update({
+  //         hand: ['0_h_a_r_i', '0_a_t_b_i', '0_h_a_r_i']
+  //       }))
+  //     });
+
+  //     it("Player can draw a card", async() => {
+  //       await firebase.assertSucceeds(table.collection("players").doc('player1').update({
+  //         hand: fv.arrayUnion('1_p_p_s_n')
+  //       }))
+  //     });
+
+  //     it("Player can draw a card", async() => {
+  //       await firebase.assertSucceeds(table.collection("players").doc('player1').update({
+  //         hand: fv.arrayUnion('1_p_p_s_n')
+  //       }))
+  //     });
+  //   });
+
+    // const successfulTable = {
+
+    // }
+    // it("Can create successful table", async() => {
+    //   await firebase.assertSucceeds(db.collection("tables").doc('uid').set(successfulTable))
+    // });
+  // });
 });
 
-after(async() => {
-  await firebase.clearFirestoreData({projectId: MY_PROJECT_ID});
-})
+// after(async() => {
+//   await firebase.clearFirestoreData({projectId: MY_PROJECT_ID});
+// })
