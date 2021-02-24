@@ -40,7 +40,8 @@ table:
     symbol: enum = [cards.id]
     position: tuple:[number,number,number] = [n<=#ofPlayers,x<=x+1,y>yE(x,y)]
   players:
-    playerID: string = uuid
+    playerID: string = player_1,2,3...
     name: string = //username or choose before game
     hand: number = //# of cards in his/her hand
+    cat_x: array = [...deck.symbol]
 ```

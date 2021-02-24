@@ -88,7 +88,7 @@ describe("nekonarabe app", () => {
   describe("tables", () => {
     describe("deck", () => {
       const successfulDeckCard = {}
-      it("Can create successful deck", async() => {
+      it("Can have successful cards", async() => {
         await firebase.assertSucceeds(db.collection("tables").doc('uid').set(successfulDeckCard))
       });
     });
