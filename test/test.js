@@ -91,20 +91,28 @@ describe("nekonarabe app", () => {
 
   describe("game flow", () => {
     const tableRef = db.collection("tables").doc()
+    const initialHeads = [
+      '0_h_a_r_i', '0_h_a_r_i', '0_h_a_b_i', '0_h_a_b_i', '0_h_a_s_i', '0_h_a_s_i',
+      '0_h_a_r_i', '0_h_a_r_i', '0_h_a_b_i', '0_h_a_b_i', '0_h_a_s_i', '0_h_a_s_i',
+    ]
+    const initialTails = [
+      '0_a_t_r_i', '0_a_t_r_i', '0_a_t_b_i', '0_a_t_b_i', '0_a_t_s_i', '0_a_t_s_i',
+      '0_a_t_r_i', '0_a_t_r_i', '0_a_t_b_i', '0_a_t_b_i', '0_a_t_s_i', '0_a_t_s_i',
+    ]
 
     it("Create table", async() => {
       const batch = db.batch();
       const dealer = tableRef.collection("players").doc("dealer");
-      batch.set(dealer, {name: 'dealer'});
+      batch.set(dealer, {name: 'dealer', initialHeadCards: initialHeads, initialTailCards: initialTails});
       const player1 = tableRef.collection("players").doc();
-      batch.set(player1, {name: 'Ryu'});
+      batch.set(player1, {name: 'Ryu', role: 'host'});
       await firebase.assertSucceeds(batch.commit())
     })
 
-    const initialCards = [
-      '0_h_a_r_i', '0_h_a_r_i', '0_h_a_b_i', '0_h_a_b_i', '0_h_a_s_i', '0_h_a_s_i',
-      '0_a_t_r_i', '0_a_t_r_i', '0_a_t_b_i', '0_a_t_b_i', '0_a_t_s_i', '0_a_t_s_i',
-    ]
+    it("Add new player before choose deck", async() => {
+      await firebase.assertSucceeds(tableRef.collection("players").doc().set({name: 'Ken', role: 'guest'}))
+    })
+    
     const sampleDeck = [
       '0_h_p_r_n', '0_h_p_r_n', '0_h_p_b_n', '0_h_p_b_n', '0_h_p_s_n', '0_h_p_s_n',
       '0_h_w_r_n', '0_h_w_r_n', '0_h_w_b_n', '0_h_w_b_n', '0_h_w_s_n', '0_h_w_s_n',
@@ -117,6 +125,37 @@ describe("nekonarabe app", () => {
       '0_p_t_r_n', '0_p_t_b_n', '0_p_t_s_n', '0_w_t_r_n', '0_w_t_b_n', '0_w_t_s_n',
       '0_a_t_r_n', '0_a_t_b_n', '0_a_t_s_n', '1_h_h_f_n', '1_h_h_f_n'
     ]
+
+    it("Choose deck", async() => {
+      let deck = []
+      sampleDeck.forEach((card) => {
+        const randomNum = Math.floor( Math.random() * 1000000000000 );
+        cardSet = {[randomNum]: card}
+        deck.push(cardSet)
+      })
+      function compare(a, b) {
+        const numA = Object.keys(a)
+        const numB = Object.keys(b)
+        let comparison = 0
+        if (numA > numB) {
+          comparison = 1
+        } else {
+          comparison = -1
+        }
+        return comparison
+      }
+      deck.sort(compare)
+      await firebase.assertSucceeds(tableRef.collection("players").doc("dealer").update({deck: deck}))
+
+    })
+
+    it("Add new player after choose deck", async() => {
+      await firebase.assertSucceeds(tableRef.collection("players").doc().set({name: 'Gin', role: 'guest'}))
+    })
+
+    it("Deal initial cards", async() => {
+      
+    })
 
   });
 
@@ -151,29 +190,29 @@ describe("nekonarabe app", () => {
 
   //     it("Player can draw initial cards", async() => {
   //       await firebase.assertSucceeds(table.collection("players").doc('player1').update({
-  //         hand: ['0_h_a_r_i', '0_a_t_b_i', '0_h_a_r_i']
+  //         hand: [{00000001: '0_h_a_r_i'}, {0000002: '0_a_t_b_i'}]
   //       }))
   //     });
 
   //     it("Player can draw a card", async() => {
   //       await firebase.assertSucceeds(table.collection("players").doc('player1').update({
-  //         hand: fv.arrayUnion('1_p_p_s_n')
+  //         hand: fv.arrayUnion({0000003: '1_p_p_s_n'})
   //       }))
   //     });
 
   //     it("Player can draw a card", async() => {
   //       await firebase.assertSucceeds(table.collection("players").doc('player1').update({
-  //         hand: fv.arrayUnion('1_p_p_s_n')
+  //         hand: fv.arrayUnion({0000004: '1_p_p_s_n'})
   //       }))
   //     });
   //   });
 
-    // const successfulTable = {
+  //   const successfulTable = {
 
-    // }
-    // it("Can create successful table", async() => {
-    //   await firebase.assertSucceeds(db.collection("tables").doc('uid').set(successfulTable))
-    // });
+  //   }
+  //   it("Can create successful table", async() => {
+  //     await firebase.assertSucceeds(db.collection("tables").doc('uid').set(successfulTable))
+  //   });
   // });
 });
 
