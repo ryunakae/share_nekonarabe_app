@@ -91,26 +91,25 @@ describe("nekonarabe app", () => {
 
   describe("game flow", () => {
     const tableRef = db.collection("tables").doc()
+    const random3 = () => Math.floor( Math.random() * 3 );
     const initialHeads = [
-      '0_h_a_r_i', '0_h_a_r_i', '0_h_a_b_i', '0_h_a_b_i', '0_h_a_s_i', '0_h_a_s_i',
-      '0_h_a_r_i', '0_h_a_r_i', '0_h_a_b_i', '0_h_a_b_i', '0_h_a_s_i', '0_h_a_s_i',
+      '0_h_a_r_i', '0_h_a_b_i', '0_h_a_s_i'
     ]
     const initialTails = [
-      '0_a_t_r_i', '0_a_t_r_i', '0_a_t_b_i', '0_a_t_b_i', '0_a_t_s_i', '0_a_t_s_i',
-      '0_a_t_r_i', '0_a_t_r_i', '0_a_t_b_i', '0_a_t_b_i', '0_a_t_s_i', '0_a_t_s_i',
+      '0_a_t_r_i', '0_a_t_b_i', '0_a_t_s_i'
     ]
 
     it("Create table", async() => {
       const batch = db.batch();
       const dealer = tableRef.collection("players").doc("dealer");
-      batch.set(dealer, {name: 'dealer', initialHeadCards: initialHeads, initialTailCards: initialTails});
+      batch.set(dealer, {name: 'dealer'});
       const player1 = tableRef.collection("players").doc();
-      batch.set(player1, {name: 'Ryu', role: 'host'});
+      batch.set(player1, {name: 'Ryu', role: 'host', hand: [initialHeads[random3()], initialTails[random3()]]});
       await firebase.assertSucceeds(batch.commit())
     })
 
     it("Add new player before choose deck", async() => {
-      await firebase.assertSucceeds(tableRef.collection("players").doc().set({name: 'Ken', role: 'guest'}))
+      await firebase.assertSucceeds(tableRef.collection("players").add({name: 'Ken', role: 'guest', hand: [initialHeads[random3()], initialTails[random3()]]}))
     })
     
     const sampleDeck = [
@@ -150,7 +149,7 @@ describe("nekonarabe app", () => {
     })
 
     it("Add new player after choose deck", async() => {
-      await firebase.assertSucceeds(tableRef.collection("players").doc().set({name: 'Gin', role: 'guest'}))
+      await firebase.assertSucceeds(tableRef.collection("players").add({name: 'Gin', role: 'guest', hand: [initialHeads[random3()], initialTails[random3()]]}))
     })
 
     it("Deal initial cards", async() => {
