@@ -7,28 +7,28 @@ service cloud.firestore {
 
     match /cards/{cardId} {
       function isCardInTheEnumFront() {
-        return request.resource.data.front in ["h_ead","p_ink","w_ater","a_lmighty"];
+        return request.resource.data.front in ["head","pink","water","almighty"];
       }
       function isCardInTheEnumBack() {
-        return request.resource.data.back in ["t_ail","p_ink","w_ater","a_lmighty","h_ead"];
+        return request.resource.data.back in ["tail","pink","water","almighty","head"];
       }
       function isCardInTheEnumCardType() {
-        return request.resource.data.cardType in ["r_ibbon","b_uchi","s_hima","f_ish","d_okan"];
+        return request.resource.data.cardType in ["ribbon","buchi","shima","fish","dokan"];
       }
       function isEqualIDZero() {
-        return request.resource.id.split('_')[0] == "0"
+        return request.resource.id[0] == "0"
       }
       function isEqualPointsZero() {
         return request.resource.data.points == 0
       }
       function isEqualIDOne() {
-        return request.resource.id.split('_')[0] == "1"
+        return request.resource.id[0] == "1"
       }
       function isEqualPointsOne() {
         return request.resource.data.points == 1
       }
       function isEqualIDTwo() {
-        return request.resource.id.split('_')[0] == "2"
+        return request.resource.id[0] == "2"
       }
       function isEqualPointsTwo() {
         return request.resource.data.points == 2
@@ -37,13 +37,13 @@ service cloud.firestore {
         return (isEqualIDZero() && isEqualPointsZero()) || (isEqualIDOne() && isEqualPointsOne()) || (isEqualIDTwo() && isEqualPointsTwo())
       }
       function isEqualFrontAndID() {
-        return request.resource.id.split('_')[1] == request.resource.data.front.split('_')[0]
+        return request.resource.id[1] == request.resource.data.front[0]
       }
       function isEqualBackAndID() {
-        return request.resource.id.split('_')[2] == request.resource.data.back.split('_')[0]
+        return request.resource.id[2] == request.resource.data.back[0]
       }
       function isEqualCardTypeAndID() {
-        return request.resource.id.split('_')[3] == request.resource.data.cardType.split('_')[0]
+        return request.resource.id[3] == request.resource.data.cardType[0]
       }
       function isTrueInitiality() {
         return request.resource.data.initiality == true
@@ -52,7 +52,7 @@ service cloud.firestore {
         return request.resource.data.initiality == false
       }
       function hasCorrectInitiality() {
-        return (isTrueInitiality() && request.resource.id.split('_')[4] == "i") || (isFalseInitiality() && request.resource.id.split('_')[4] == "n")
+        return (isTrueInitiality() && request.resource.id[4] == "i") || (isFalseInitiality() && request.resource.id[4] == "n")
       }
       function isSuccessfulCard() {
         return isCardInTheEnumFront() && isCardInTheEnumBack() && isCardInTheEnumCardType() && isEqualPointsAndID() && isEqualFrontAndID() && isEqualBackAndID() && isEqualCardTypeAndID() && hasCorrectInitiality()
