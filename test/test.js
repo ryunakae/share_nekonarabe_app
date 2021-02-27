@@ -93,10 +93,10 @@ describe("nekonarabe app", () => {
     const tableRef = db.collection("tables").doc()
     const random3 = () => Math.floor( Math.random() * 3 );
     const initialHeads = [
-      '0_h_a_r_i', '0_h_a_b_i', '0_h_a_s_i'
+      {0: '0_h_a_r_i'}, {0: '0_h_a_b_i'}, {0: '0_h_a_s_i'}
     ]
     const initialTails = [
-      '0_a_t_r_i', '0_a_t_b_i', '0_a_t_s_i'
+      {1: '0_a_t_r_i'}, {1: '0_a_t_b_i'}, {1: '0_a_t_s_i'}
     ]
 
     it("Create table", async() => {
@@ -104,12 +104,12 @@ describe("nekonarabe app", () => {
       const dealer = tableRef.collection("players").doc("dealer");
       batch.set(dealer, {name: 'dealer'});
       const player1 = tableRef.collection("players").doc();
-      batch.set(player1, {name: 'Ryu', role: 'host', hand: [initialHeads[random3()], initialTails[random3()]]});
+      batch.set(player1, {name: 'Ryu', role: 'host', hand: [initialHeads[random3()], initialTails[random3()]], player: true});
       await firebase.assertSucceeds(batch.commit())
     })
 
     it("Add new player before choose deck", async() => {
-      await firebase.assertSucceeds(tableRef.collection("players").add({name: 'Ken', role: 'guest', hand: [initialHeads[random3()], initialTails[random3()]]}))
+      await firebase.assertSucceeds(tableRef.collection("players").add({name: 'Ken', role: 'guest', hand: [initialHeads[random3()], initialTails[random3()]], player: true}))
     })
     
     const sampleDeck = [
@@ -149,13 +149,34 @@ describe("nekonarabe app", () => {
     })
 
     it("Add new player after choose deck", async() => {
-      await firebase.assertSucceeds(tableRef.collection("players").add({name: 'Gin', role: 'guest', hand: [initialHeads[random3()], initialTails[random3()]]}))
+      await firebase.assertSucceeds(tableRef.collection("players").add({name: 'Gin', role: 'guest', hand: [initialHeads[random3()], initialTails[random3()]], player: true}))
     })
 
-    it("Deal initial cards", async() => {
-      
+    it("Deal first three cards", async() => {
+      const batch = db.batch()
+      const dealerRef = tableRef.collection("players").doc("dealer");
+      const deck = (await dealerRef.get()).data().deck;
+      const players = await tableRef.collection("players").where("player","==",true).get();
+      let i = 0
+      players.forEach((player) => {
+        batch.update(dealerRef, {deck: fv.arrayRemove(deck[i], deck[i + 1], deck[i + 2])});
+        batch.update(player.ref, {hand: fv.arrayUnion(deck[i], deck[i + 1], deck[i + 2])});
+        i += 3
+      })
+      await firebase.assertSucceeds(batch.commit())
     })
 
+    it("Open two cards", async() => {
+      const dealerRef = tableRef.collection("players").doc("dealer");
+      const deck = (await dealerRef.get()).data().deck;
+      await firebase.assertSucceeds(
+        dealerRef.update({
+          deck: fv.arrayRemove(deck[0], deck[1]),
+          opens: fv.arrayUnion(deck[0], deck[1])
+        })
+      )
+    })
+    
   });
 
   // describe("tables", () => {
