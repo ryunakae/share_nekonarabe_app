@@ -1,7 +1,7 @@
 const assert = require('assert');
 const firebase = require('@firebase/testing');
 const { SSL_OP_EPHEMERAL_RSA } = require('constants');
-const { type } = require('os');
+const testFunc = require('./functions.js');
 
 const MY_PROJECT_ID = "nekonarabe-app";
 
@@ -10,8 +10,9 @@ const MY_PROJECT_ID = "nekonarabe-app";
 // })
 
 describe("nekonarabe app", () => {
-  const db = firebase.initializeTestApp({projectId: MY_PROJECT_ID}).firestore();
-  const fv = firebase.firestore.FieldValue
+  const db = testFunc.db;
+  const fv = testFunc.fv;
+  const ft = testFunc.ft;
   
   describe("cards", () => {
     const cards = db.collection("cards");
@@ -104,6 +105,7 @@ describe("nekonarabe app", () => {
 
     let ryu;
     it("Create table", async() => {
+      tableRef.set({createdAt: ft.now(), updatedAt: ft.now(),})
       const batch = db.batch();
       batch.set(dealerRef, {name: 'dealer'});
       const playerRef = tableRef.collection("players").doc();
@@ -117,7 +119,10 @@ describe("nekonarabe app", () => {
     it("Add new player before choose deck", async() => {
       await firebase.assertSucceeds(tableRef.collection("players")
         .add({name: 'Ken', role: 'guest', hand: [initialHeads[random3()], initialTails[random3()]], player: true}))
-        .then((playerRef) => { ken = playerRef })
+        .then((playerRef) => {
+          ken = playerRef
+          tableRef.update({updatedAt: ft.now()})
+        })
       assert((await ken.get()).exists)
     })
     
@@ -153,7 +158,9 @@ describe("nekonarabe app", () => {
         return comparison
       }
       deck.sort(compare)
-      await firebase.assertSucceeds(dealerRef.update({deck: deck}))
+      await firebase.assertSucceeds(dealerRef.update({deck: deck})
+                                      .then(() => {tableRef.update({updatedAt: ft.now()})})
+                                    )
       assert(tableRef.collection("player").orderBy("deck"))
     })
 
@@ -161,7 +168,10 @@ describe("nekonarabe app", () => {
     it("Add new player after choose deck", async() => {
       await firebase.assertSucceeds(tableRef.collection("players")
         .add({name: 'Gin', role: 'guest', hand: [initialHeads[random3()], initialTails[random3()]], player: true}))
-        .then((playerRef) => { gin = playerRef })
+        .then((playerRef) => {
+          gin = playerRef
+          tableRef.update({updatedAt: ft.now()})
+        })
     })
 
     it("Deal first three cards", async() => {
@@ -174,7 +184,9 @@ describe("nekonarabe app", () => {
         batch.update(player.ref, {hand: fv.arrayUnion(deck[i], deck[i + 1], deck[i + 2])});
         i += 3
       })
-      await firebase.assertSucceeds(batch.commit())
+      await firebase.assertSucceeds(batch.commit()
+                                      .then(() => {tableRef.update({updatedAt: ft.now()})})
+                                    )
     })
 
     it("Open two cards", async() => {
@@ -184,6 +196,7 @@ describe("nekonarabe app", () => {
           deck: fv.arrayRemove(deck[0], deck[1]),
           opens: fv.arrayUnion(deck[0], deck[1])
         })
+        .then(() => {tableRef.update({updatedAt: ft.now()})})
       )
     })
     
@@ -193,7 +206,9 @@ describe("nekonarabe app", () => {
       const playerRef = ryu;
       batch.update(dealerRef, {deck: fv.arrayRemove(deck[0])});
       batch.update(playerRef, {hand: fv.arrayUnion(deck[0])});
-      await firebase.assertSucceeds(batch.commit())
+      await firebase.assertSucceeds(batch.commit()
+                                      .then(() => {tableRef.update({updatedAt: ft.now()})})
+                                    )
     })
 
     it ("draw a card from opens", async() => {
@@ -205,139 +220,52 @@ describe("nekonarabe app", () => {
       batch.update(dealerRef, {opens: fv.arrayRemove(opens[chosen])});
       batch.update(playerRef, {hand: fv.arrayUnion(opens[chosen])});
       batch.update(dealerRef, {opens: fv.arrayUnion(deck[0]), deck: fv.arrayRemove(deck[0])})
-      await firebase.assertSucceeds(batch.commit())
+      await firebase.assertSucceeds(batch.commit()
+                                      .then(() => {tableRef.update({updatedAt: ft.now()})})
+                                    )
     })
 
-    const drawCard = async(playerRef) => {
-      const batch = db.batch();
-      const deck = (await dealerRef.get()).data().deck;
-      batch.update(dealerRef, {deck: fv.arrayRemove(deck[0])});
-      batch.update(playerRef, {hand: fv.arrayUnion(deck[0])});
-      await batch.commit()
-    }
     it ("keap drawing cards from deck for 14 loops", async() => {
       for (let i = 0; i < 14; i++) {
-        await drawCard(gin);
-        await drawCard(ryu);
-        await drawCard(ken);
+        await testFunc.drawCard(gin, dealerRef).then(() => {tableRef.update({updatedAt: ft.now()})});
+        await testFunc.drawCard(ryu, dealerRef).then(() => {tableRef.update({updatedAt: ft.now()})});
+        await testFunc.drawCard(ken, dealerRef).then(() => {tableRef.update({updatedAt: ft.now()})});
       }
-      await firebase.assertSucceeds(drawCard(gin))
+      await firebase.assertSucceeds(testFunc.drawCard(gin, dealerRef)
+                                      .then(() => {tableRef.update({updatedAt: ft.now()})})
+                                    )
     })
 
     it ("play first head card", async() => {
       const hand = (await ryu.get()).data().hand;
-      await firebase.assertSucceeds(ryu.update({hand: fv.arrayRemove(hand[0]), cat1: fv.arrayUnion(hand[0])}))
+      await firebase.assertSucceeds(ryu.update({hand: fv.arrayRemove(hand[0]), cat1: fv.arrayUnion(hand[0])})
+                                      .then(() => {tableRef.update({updatedAt: ft.now()})})
+                                    )
     })
 
-    it ("create a complete cat in a turn", async() => {
-      const sortTypes = (handCards, ribbons, buchis, shimas, fish, dokan) => {
-        handCards.forEach(card => {
-          if (Object.values(card)[0][3] === "r") {
-            ribbons.push(card)
-          } else if (Object.values(card)[0][3] === "b") {
-            buchis.push(card)
-          } else if (Object.values(card)[0][3] === "s") {
-            shimas.push(card)
-          } else if (Object.values(card)[0][3] === "f") {
-            fish.push(card)
-          } else if (Object.values(card)[0][3] === "d") {
-            dokan.push(card)
-          }
+    it ("create a complete cat and proceed game till finish", async() => {
+      const kenHand = (await ken.get()).data().hand;
+      const ginHand = (await gin.get()).data().hand;
+      if (testFunc.createCompleteCat(kenHand).length > 2) {
+        const completeCat = testFunc.createCompleteCat(kenHand)
+        completeCat.forEach((catPart) => {
+          ken.update({hand: fv.arrayRemove(catPart), cat1: fv.arrayUnion(catPart)})
         })
-      }
-      const hasHeadAndTail = (types) => {
-        let head = false
-        let tail = false
-        types.forEach(card => {
-          if (Object.values(card)[0][1] === "h") {head = true}
-          if (Object.values(card)[0][2] === "t") {tail = true}
-        })
-        return head && tail
-      }
-      const addHead = (types, completeCat) => {
-        if (hasHeadAndTail(types)) {
-          let i = 0;
-          types.forEach(card => {
-            if (Object.values(card)[0][1] === "h") {
-              if (completeCat.length == 0) {
-                completeCat.push(card)
-                types.splice(i,1)
-              }
-            }
-            i++
+        await testFunc.drawCard(gin, dealerRef).then(() => {tableRef.update({updatedAt: ft.now()})})
+        await testFunc.drawCard(ryu, dealerRef).then(() => {tableRef.update({updatedAt: ft.now()})})
+      } else {
+        await testFunc.drawCard(ken, dealerRef).then(() => {tableRef.update({updatedAt: ft.now()})})
+        if (testFunc.createCompleteCat(ginHand).length > 2) {
+          const completeCat = testFunc.createCompleteCat(ginHand)
+          completeCat.forEach((catPart) => {
+            gin.update({hand: fv.arrayRemove(catPart), cat1: fv.arrayUnion(catPart)})
+              .then(() => {tableRef.update({updatedAt: ft.now()})})
           })
+          await testFunc.drawCard(ryu, dealerRef).then(() => {tableRef.update({updatedAt: ft.now()})})
+        } else {
+          await testFunc.drawCard(gin, dealerRef).then(() => {tableRef.update({updatedAt: ft.now()})})
         }
       }
-      const addBody = (types, completeCat, n) => {
-        let i = 0;
-        types.forEach(card => {
-          if (completeCat.length == n && Object.values(card)[0][2] != "t" && Object.values(card)[0][1] != "h") {
-            const lastCard = completeCat[n - 1]
-            if (Object.values(card)[0][1] === Object.values(lastCard)[0][2] || Object.values(lastCard)[0][2] === "a") {
-              completeCat.push(card)
-              types.splice(i,1)
-            }
-          }
-          i++
-        })
-      }
-      const addTail = (types, completeCat, n) => {
-        let i = 0;
-        types.forEach(card => {
-          if (completeCat.length == n && Object.values(card)[0][2] == "t") {
-            const lastCard = completeCat[n - 1]
-            if (Object.values(card)[0][1] === Object.values(lastCard)[0][2] || Object.values(lastCard)[0][2] === "a") {
-              completeCat.push(card)
-              types.splice(i,1)
-            }
-          }
-          i++
-        })
-      }
-      const createCompleteCat = (handCards) => {
-        const ribbons = [];
-        const buchis = [];
-        const shimas = [];
-        const fish = [];
-        const dokan = [];
-        const completeRibbonCat = [];
-        const completeBuchiCat = [];
-        const completeShimaCat = [];
-        sortTypes(handCards, ribbons, buchis, shimas, fish, dokan)
-        const set = [[ribbons, completeRibbonCat], [buchis, completeBuchiCat], [shimas, completeShimaCat]]
-        set.forEach(type => {
-          addHead(type[0], type[1]);
-          addBody(type[0], type[1], 1);
-          addTail(type[0], type[1], 2);
-        })
-        let complete;
-        if (completeRibbonCat.length == 3) {
-          complete = completeRibbonCat
-        } else if (completeBuchiCat.length == 3) {
-          complete = completeBuchiCat
-        } else if (completeShimaCat.length == 3) {
-          complete = completeShimaCat
-        } 
-        else {
-          set.forEach(type =>{
-            addBody(dokan, type[1], 2);
-            addTail(type[0], type[1], 3);
-          })
-          if (completeRibbonCat.length == 4) {
-            complete = completeRibbonCat
-          } else if (completeBuchiCat.length == 4) {
-            complete = completeBuchiCat
-          } else if (completeShimaCat.length == 4) {
-            complete = completeShimaCat
-          }
-        }
-        return complete
-      }
-      const hand = (await ken.get()).data().hand;
-      console.log(createCompleteCat(hand))
-      createCompleteCat(hand).forEach(async(cat) => {
-        await firebase.assertSucceeds(ken.update({hand: fv.arrayRemove(cat), cat1: fv.arrayUnion(cat)}))
-      })
     })
   });
 

@@ -63,12 +63,20 @@ service cloud.firestore {
     }
 
     match /tables/{tableId} {
-    
+      function isRightCreatedAt() {
+        return request.resource.data.createdAt == request.time
+      }
+      function isRightUpdatedAt() {
+        return request.resource.data.updatedAt == request.time
+      }
+      function isRightTimestamps() {
+        return isRightCreatedAt() && isRightUpdatedAt()
+      }
       function isSuccessfulTable() {
-        return true
+        return isRightTimestamps()
       }
       function isAllowedChangeForTable() {
-        return true
+        return isRightUpdatedAt()
       }
 
       allow read: if true
