@@ -243,28 +243,33 @@ describe("nekonarabe app", () => {
                                     )
     })
 
-    it ("create a complete cat and proceed game till finish", async() => {
+    it ("create a complete cat and draw", async() => {
       const kenHand = (await ken.get()).data().hand;
       const ginHand = (await gin.get()).data().hand;
+      const ryuHand = (await ryu.get()).data().hand;
+      console.log(testFunc.createCompleteCat(kenHand).length)
+      console.log(testFunc.createCompleteCat(ginHand))
+      console.log(testFunc.createCompleteCat(ginHand).length)
+      console.log(testFunc.createCompleteCat(ryuHand))
+      console.log(testFunc.createCompleteCat(ryuHand).length)
       if (testFunc.createCompleteCat(kenHand).length > 2) {
         const completeCat = testFunc.createCompleteCat(kenHand)
         completeCat.forEach((catPart) => {
           ken.update({hand: fv.arrayRemove(catPart), cat1: fv.arrayUnion(catPart)})
         })
         await testFunc.drawCard(gin, dealerRef).then(() => {tableRef.update({updatedAt: ft.now()})})
-        await testFunc.drawCard(ryu, dealerRef).then(() => {tableRef.update({updatedAt: ft.now()})})
-      } else {
+        // await testFunc.drawCard(ryu, dealerRef).then(() => {tableRef.update({updatedAt: ft.now()})})
+      } else if (testFunc.createCompleteCat(ginHand).length > 2) {
         await testFunc.drawCard(ken, dealerRef).then(() => {tableRef.update({updatedAt: ft.now()})})
-        if (testFunc.createCompleteCat(ginHand).length > 2) {
-          const completeCat = testFunc.createCompleteCat(ginHand)
-          completeCat.forEach((catPart) => {
-            gin.update({hand: fv.arrayRemove(catPart), cat1: fv.arrayUnion(catPart)})
-              .then(() => {tableRef.update({updatedAt: ft.now()})})
-          })
-          await testFunc.drawCard(ryu, dealerRef).then(() => {tableRef.update({updatedAt: ft.now()})})
-        } else {
-          await testFunc.drawCard(gin, dealerRef).then(() => {tableRef.update({updatedAt: ft.now()})})
-        }
+        const completeCat = testFunc.createCompleteCat(ginHand)
+        completeCat.forEach(async(catPart) => {
+          await firebase.assertSucceeds(gin.update({hand: fv.arrayRemove(catPart), cat1: fv.arrayUnion(catPart)})
+            .then(() => {tableRef.update({updatedAt: ft.now()})}))
+        })
+      } else {
+        await firebase.assertSucceeds(gin.update({hand: fv.arrayRemove(ginHand[0]), cat1: fv.arrayUnion(ginHand[0])})
+                                    .then(() => {tableRef.update({updatedAt: ft.now()})})
+                                  )
       }
     })
   });

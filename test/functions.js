@@ -18,17 +18,21 @@ exports.drawCard = async(playerRef, dealerRef) => {
   await batch.commit()
 }
 
+const judgeTypes = exports.judgeTypes = (card) => {
+  return Object.values(card)[0][3]
+}
+
 const sortTypes = exports.sortTypes = (handCards, ribbons, buchis, shimas, fish, dokan) => {
   handCards.forEach(async(card) => {
-    if (Object.values(card)[0][3] === "r") {
+    if (judgeTypes(card) === "r") {
       ribbons.push(card)
-    } else if (Object.values(card)[0][3] === "b") {
+    } else if (judgeTypes(card) === "b") {
       buchis.push(card)
-    } else if (Object.values(card)[0][3] === "s") {
+    } else if (judgeTypes(card) === "s") {
       shimas.push(card)
-    } else if (Object.values(card)[0][3] === "f") {
+    } else if (judgeTypes(card) === "f") {
       fish.push(card)
-    } else if (Object.values(card)[0][3] === "d") {
+    } else if (judgeTypes(card) === "d") {
       dokan.push(card)
     }
   })
@@ -98,7 +102,7 @@ exports.createCompleteCat = (handCards) => {
   const completeShimaCat = [];
   sortTypes(handCards, ribbons, buchis, shimas, fish, dokan)
   const set = [[ribbons, completeRibbonCat], [buchis, completeBuchiCat], [shimas, completeShimaCat]]
-  set.forEach(async(type) => {
+  set.forEach((type) => {
     addHead(type[0], type[1]);
     addBody(type[0], type[1], 1);
     addTail(type[0], type[1], 2);
@@ -112,7 +116,7 @@ exports.createCompleteCat = (handCards) => {
     complete = completeShimaCat
   } 
   else {
-    set.forEach(async(type) =>{
+    set.forEach((type) =>{
       addBody(dokan, type[1], 2);
       addTail(type[0], type[1], 3);
     })
